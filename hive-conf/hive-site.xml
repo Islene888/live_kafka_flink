@@ -1,0 +1,17 @@
+<configuration>
+    <!-- 1. 指定 Metastore Thrift 服务地址 -->
+    <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://0.0.0.0:9083</value>
+    </property>
+    <!-- 2. 本机文件系统，不用 HDFS -->
+    <property>
+        <name>fs.defaultFS</name>
+        <value>file:///</value>
+    </property>
+    <!-- 3. 仓库目录，Metastore 在本地创建表数据 -->
+    <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>/opt/hive/warehouse</value>
+    </property>
+</configuration>
