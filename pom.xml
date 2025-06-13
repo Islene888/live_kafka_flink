@@ -20,27 +20,34 @@
     </properties>
 
     <dependencies>
-        <!-- Flink -->
+        <!-- Flink Java API -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-clients</artifactId>
+            <artifactId>flink-java_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
+        <!-- Flink Streaming API -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-java</artifactId>
+            <artifactId>flink-streaming-java_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
-        <!-- Flink Kafka Connector，自动引入兼容kafka-clients -->
+        <!-- Flink Client -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka</artifactId>
+            <artifactId>flink-clients-java_2.12</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!-- Flink Kafka Connector -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
         <!-- Flink JDBC Connector -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-jdbc</artifactId>
+            <artifactId>flink-connector-jdbc_2.12</artifactId>
             <version>3.1.1-1.17</version>
         </dependency>
         <!-- Flink StarRocks Connector -->
@@ -55,6 +62,22 @@
             <artifactId>flink-connector-hive_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
+        <!-- Jackson for JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.17.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.17.1</version>
+        </dependency>
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -62,42 +85,24 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- JUnit for test -->
+        <!-- SLF4J Simple Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.36</version>
+        </dependency>
+        <!-- JUnit Jupiter for Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.36</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.17.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-java</artifactId>
-            <version>1.17.1</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.36</version>
-        </dependency>
-
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Compiler Plugin -->
+            <!-- Maven Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -114,7 +119,7 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            <!-- Shade Plugin for fat jar -->
+            <!-- Maven Shade Plugin for Fat Jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -123,7 +128,9 @@
                     <execution>
                         <id>shade-jar-with-dependencies</id>
                         <phase>package</phase>
-                        <goals><goal>shade</goal></goals>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <filters>
@@ -139,6 +146,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
+                                        <!-- 修改为你的 main 类 -->
                                         <Main-Class>ella.diktok_globle_live.LiveEventFlinkJob</Main-Class>
                                     </manifestEntries>
                                 </transformer>
