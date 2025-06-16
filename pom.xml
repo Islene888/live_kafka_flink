@@ -11,98 +11,104 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>Flink Kafka Demo</name>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.1.5</version> <!-- 换成你要的 Spring Boot 版本 -->
+        <relativePath/>         <!-- lookup parent from repository -->
+    </parent>
+
     <properties>
         <java.version>11</java.version>
         <flink.version>1.17.1</flink.version>
-        <lombok.version>1.18.28</lombok.version>
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
-        <maven.shade.plugin.version>3.2.4</maven.shade.plugin.version>
     </properties>
 
     <dependencies>
-        <!-- Flink Java API -->
+        <!-- Flink 核心 -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-java_2.12</artifactId>
+            <artifactId>flink-streaming-java</artifactId>
             <version>${flink.version}</version>
         </dependency>
-        <!-- Flink Streaming API -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-java_2.12</artifactId>
+            <artifactId>flink-clients</artifactId>
             <version>${flink.version}</version>
         </dependency>
-        <!-- Flink Client -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-clients-java_2.12</artifactId>
+            <artifactId>flink-connector-kafka</artifactId>
             <version>${flink.version}</version>
         </dependency>
-        <!-- Flink Kafka Connector -->
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka_2.12</artifactId>
+            <artifactId>flink-connector-jdbc</artifactId>
+            <version>3.1.2-1.17</version>
+        </dependency>
+        <!-- S3 文件系统依赖 -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-s3-fs-hadoop</artifactId>
             <version>${flink.version}</version>
         </dependency>
-        <!-- Flink JDBC Connector -->
+        <!-- 关键补充：Hadoop AWS 依赖！ -->
         <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-jdbc_2.12</artifactId>
-            <version>3.1.1-1.17</version>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-aws</artifactId>
+            <version>3.2.4</version>
         </dependency>
-        <!-- Flink StarRocks Connector -->
+        <!-- 其它依赖 -->
         <dependency>
-            <groupId>com.starrocks</groupId>
-            <artifactId>flink-connector-starrocks</artifactId>
-            <version>1.2.9_flink-1.17</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.3</version>
         </dependency>
-        <!-- Flink Hive Connector -->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-hive_2.12</artifactId>
-            <version>${flink.version}</version>
-        </dependency>
-        <!-- Jackson for JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.17.1</version>
+            <version>2.14.2</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.17.1</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.1</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.17.1</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
-        <!-- Lombok -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!-- SLF4J Simple Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.36</version>
-        </dependency>
-        <!-- JUnit Jupiter for Testing -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.10.0</version>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
+
     <build>
         <plugins>
-            <!-- Maven Compiler Plugin -->
+            <!-- 编译插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -110,23 +116,16 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            <!-- Maven Shade Plugin for Fat Jar -->
+
+            <!-- Shade 插件：打包所有依赖进 fat jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>${maven.shade.plugin.version}</version>
+                <version>3.4.1</version>
                 <executions>
                     <execution>
-                        <id>shade-jar-with-dependencies</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
@@ -143,18 +142,11 @@
                                     </excludes>
                                 </filter>
                             </filters>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <manifestEntries>
-                                        <!-- 修改为你的 main 类 -->
-                                        <Main-Class>ella.diktok_globle_live.LiveEventFlinkJob</Main-Class>
-                                    </manifestEntries>
-                                </transformer>
-                            </transformers>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
 </project>

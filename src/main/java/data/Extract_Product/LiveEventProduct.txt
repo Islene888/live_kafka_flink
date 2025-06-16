@@ -1,15 +1,18 @@
-package ella.diktok_globle_live;
+package data.Extract_Product;
 
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
-
 import java.util.Properties;
 import java.util.Random;
 
 public class LiveEventProducer {
     public static void main(String[] args) {
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+
+        // 这里就是你要放的位置 ↓↓↓
+        String kafkaBootstrap = System.getenv().getOrDefault("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrap);
+
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
@@ -32,6 +35,6 @@ public class LiveEventProducer {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {}
         }
-        // producer.close(); // 你可根据需求加关闭
+        // producer.close(); // 可选关闭
     }
 }

@@ -1,4 +1,4 @@
-package ella.diktok_globle_live;
+package data.temp;
 
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
