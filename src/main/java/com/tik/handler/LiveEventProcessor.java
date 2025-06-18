@@ -30,19 +30,20 @@ public class LiveEventProcessor {
             public Tuple2<String, Integer> map(String value) throws Exception {
                 try {
                     JsonNode root = objectMapper.readTree(value);
-                    // 支持不同 key 命名，比如 event_type 或 eventType
-                    // 支持 eventType 优先（小驼峰，和你前端一致），其次兼容 event_type（下划线，万一有别的后端推数据）
                     JsonNode typeNode = root.has("eventType") ? root.get("eventType") : root.get("event_type");
                     if (typeNode == null || typeNode.isNull()) {
-                        return null; // 或者返回 Tuple2.of("unknown", 1)
+                        System.out.println("❌ 没有找到 eventType, 原文: " + value);
+                        return null;
                     }
-                    return Tuple2.of(typeNode.asText(), 1);
+                    String eventType = typeNode.asText();
+                    System.out.println("🔥 Flink收到事件: " + eventType + " | " + value);
+                    return Tuple2.of(eventType, 1);
                 } catch (Exception e) {
-                    // 可以考虑加日志
-                    // log.warn("JSON解析失败: {}", value, e);
+                    System.out.println("❌ 解析 JSON 失败: " + value);
                     return null;
                 }
             }
+
         };
     }
 }

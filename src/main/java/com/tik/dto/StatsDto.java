@@ -1,6 +1,6 @@
 package com.tik.dto;
 
-import com.amazonaws.thirdparty.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class StatsDto {
     @JsonProperty("user_join")

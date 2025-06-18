@@ -118,6 +118,14 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.1.5</version>
+                <configuration>
+                    <mainClass>com.tik.WebsocketDemoApplication</mainClass>
+                </configuration>
+            </plugin>
 
             <!-- Shade 插件：打包所有依赖进 fat jar -->
             <plugin>

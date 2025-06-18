@@ -53,31 +53,25 @@ public class KafkaEventTypeForwarder {
         String bootstrapServers = "localhost:9092";
         String outputTopic = "live-events-agg";
 
+
         aggStream
-                .keyBy(t -> t.f0)
-                .window(TumblingProcessingTimeWindows.of(Time.seconds(1)))
-                .reduce(new ReduceFunction<Tuple2<String, Integer>>() {
-                    @Override
-                    public Tuple2<String, Integer> reduce(Tuple2<String, Integer> v1, Tuple2<String, Integer> v2) {
-                        return Tuple2.of(v1.f0, v1.f1 + v2.f1);
-                    }
-                })
+                // 直接使用一个5秒的窗口
                 .windowAll(TumblingProcessingTimeWindows.of(Time.seconds(5)))
+                // 使用 ProcessAllWindowFunction 来处理这个5秒窗口内的所有数据
                 .process(new ProcessAllWindowFunction<Tuple2<String, Integer>, String, TimeWindow>() {
                     @Override
                     public void process(Context context, Iterable<Tuple2<String, Integer>> elements, Collector<String> out) throws Exception {
-                        // 补全所有你需要前端展示的统计字段，确保始终输出
+                        // 初始化所有需要统计的字段
                         Map<String, Integer> stats = new HashMap<>();
                         stats.put("like", 0);
                         stats.put("comment", 0);
                         stats.put("user_join", 0);
                         stats.put("send_gift", 0);
-                        // ...如有更多类型，继续加
 
-                        // 聚合覆盖已有类型
-                        for (Tuple2<String, Integer> t : elements) {
-                            if (t != null && t.f0 != null && stats.containsKey(t.f0)) {
-                                stats.put(t.f0, t.f1);
+                        // 遍历窗口内的所有元素并累加
+                        for (Tuple2<String, Integer> element : elements) {
+                            if (element != null && element.f0 != null) {
+                                stats.compute(element.f0, (key, oldValue) -> (oldValue == null) ? element.f1 : oldValue + element.f1);
                             }
                         }
                         ObjectMapper om = new ObjectMapper();
@@ -85,7 +79,6 @@ public class KafkaEventTypeForwarder {
                     }
                 })
                 .sinkTo(KafkaSinkUtil.createKafkaSink(bootstrapServers, outputTopic));
-
         env.execute("Flink Kafka EventType Forwarder");
     }
 }

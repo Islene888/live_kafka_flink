@@ -166,7 +166,7 @@
 
     let ws;
     const MY_USER_ID = "user_" + Math.random().toString(36).substr(2, 9);
-    const WS_URL = 'ws://localhost:8080/ws'; // 确保这和你的后端地址一致
+    const WS_URL = "ws://localhost:8080/ws";
 
     // --- WebSocket Logic ---
     function connect() {
@@ -240,10 +240,10 @@
     // --- Event Handler ---
     function handleIncomingEvent(event) {
         // 后端广播的事件不应该由自己再次触发
-        // if (event.userId === MY_USER_ID) {
-        //     console.log("忽略自己发送的事件广播");
-        //     // return; // 如果不希望看到自己发的事件，可以取消这行注释
-        // }
+        if (event.userId === MY_USER_ID) {
+            console.log("忽略自己发送的事件广播");
+            return;
+        }
 
         switch(event.eventType) {
             case 'comment':
@@ -371,6 +371,7 @@
     // 假设服务端每次推送都是累计总数
     statsWs.onmessage = function(event) {
         const stats = JSON.parse(event.data);
+        console.log('实时收到 stats-ws 数据:', stats);
         document.getElementById('stat-user').textContent = stats.user_join || 0;
         document.getElementById('stat-like').textContent = stats.like || 0;
         document.getElementById('stat-comment').textContent = stats.comment || 0;
