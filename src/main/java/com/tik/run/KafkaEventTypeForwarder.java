@@ -55,8 +55,8 @@ public class KafkaEventTypeForwarder {
 
 
         aggStream
-                // 直接使用一个5秒的窗口
-                .windowAll(TumblingProcessingTimeWindows.of(Time.seconds(5)))
+                // 直接使用一2秒的窗口
+                .windowAll(TumblingProcessingTimeWindows.of(Time.seconds(2)))
                 // 使用 ProcessAllWindowFunction 来处理这个5秒窗口内的所有数据
                 .process(new ProcessAllWindowFunction<Tuple2<String, Integer>, String, TimeWindow>() {
                     @Override

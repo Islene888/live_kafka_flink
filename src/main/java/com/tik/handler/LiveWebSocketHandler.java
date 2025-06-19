@@ -18,7 +18,6 @@ public class LiveWebSocketHandler extends TextWebSocketHandler {
     private static final Logger log = LoggerFactory.getLogger(LiveWebSocketHandler.class);
     private final Set<WebSocketSession> sessions = ConcurrentHashMap.newKeySet();
 
-    // 注入我们刚刚创建的Kafka服务
     @Autowired
     private KafkaService kafkaService;
 
@@ -42,10 +41,8 @@ public class LiveWebSocketHandler extends TextWebSocketHandler {
         String payload = message.getPayload();
         log.info("💬 收到来自 {} 的消息: {}", session.getId(), payload);
 
-        // 1. 发送到 Kafka
         kafkaService.sendEvent(payload);
 
-        // 2. 广播给所有在线 ws 客户端（包括自己，IM和直播普遍如此）
         for (WebSocketSession ws : sessions) {
             if (ws.isOpen()) {
                 synchronized (ws) { // 保证消息顺序，防止并发

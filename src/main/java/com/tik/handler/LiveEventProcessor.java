@@ -6,16 +6,10 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 
-/**
- * 提供用于提取事件类型并计数的 Flink 算子（RichMapFunction）。
- * 输入为 JSON 字符串，输出为 (eventType, 1) 这样的二元组，可直接用于 KeyBy、Window 等后续聚合。
- */
+
 public class LiveEventProcessor {
 
-    /**
-     * 获取事件类型计数算子。
-     * 用法：dataStream.map(EventTypeAggOperator.eventTypeMapper())
-     */
+
     public static RichMapFunction<String, Tuple2<String, Integer>> eventTypeMapper() {
         return new RichMapFunction<String, Tuple2<String, Integer>>() {
             // Flink 推荐不可序列化对象（如 ObjectMapper）用 transient 修饰

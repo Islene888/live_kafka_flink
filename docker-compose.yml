@@ -76,119 +76,119 @@ services:
   # -----------------------------------------------------------------
   # Storage Layer: HDFS & MinIO (S3)
   # -----------------------------------------------------------------
-  hdfs-namenode:
-    platform: linux/amd64
-    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
-    container_name: hdfs-namenode
-    ports:
-      - "9870:9870"
-    volumes:
-      - namenode-data:/hadoop/dfs/name
-    environment:
-      - CLUSTER_NAME=test
-    networks:
-      - appnet
+#  hdfs-namenode:
+#    platform: linux/amd64
+#    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+#    container_name: hdfs-namenode
+#    ports:
+#      - "9870:9870"
+#    volumes:
+#      - namenode-data:/hadoop/dfs/name
+#    environment:
+#      - CLUSTER_NAME=test
+#    networks:
+#      - appnet
+#
+#  hdfs-datanode:
+#    platform: linux/amd64
+#    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+#    container_name: hdfs-datanode
+#    depends_on:
+#      - hdfs-namenode
+#    volumes:
+#      - datanode-data:/hadoop/dfs/data
+#    environment:
+#      SERVICE_PRECONDITION: "hdfs-namenode:9870" # bde2020 镜像特性
+#    networks:
+#      - appnet
 
-  hdfs-datanode:
-    platform: linux/amd64
-    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-    container_name: hdfs-datanode
-    depends_on:
-      - hdfs-namenode
-    volumes:
-      - datanode-data:/hadoop/dfs/data
-    environment:
-      SERVICE_PRECONDITION: "hdfs-namenode:9870" # bde2020 镜像特性
-    networks:
-      - appnet
-
-  minio:
-    image: minio/minio:latest # 使用latest或固定一个新版本
-    container_name: minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_data:/data
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    command: server /data --console-address ":9001"
-    networks:
-      - appnet
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+#  minio:
+#    image: minio/minio:latest # 使用latest或固定一个新版本
+#    container_name: minio
+#    ports:
+#      - "9000:9000"
+#      - "9001:9001"
+#    volumes:
+#      - minio_data:/data
+#    environment:
+#      MINIO_ROOT_USER: minioadmin
+#      MINIO_ROOT_PASSWORD: minioadmin
+#    command: server /data --console-address ":9001"
+#    networks:
+#      - appnet
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
 
   # -----------------------------------------------------------------
   # SQL & Data Warehouse Layer: Hive & StarRocks
   # -----------------------------------------------------------------
-  hive-metastore-postgresql:
-    platform: linux/amd64
-    image: postgres:14-alpine # 升级PostgreSQL版本
-    container_name: hive-metastore-postgresql
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: metastore
-      POSTGRES_USER: hive
-      POSTGRES_PASSWORD: hivepw
-    networks:
-      - appnet
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hive -d metastore"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+#  hive-metastore-postgresql:
+#    platform: linux/amd64
+#    image: postgres:14-alpine # 升级PostgreSQL版本
+#    container_name: hive-metastore-postgresql
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data
+#    environment:
+#      POSTGRES_DB: metastore
+#      POSTGRES_USER: hive
+#      POSTGRES_PASSWORD: hivepw
+#    networks:
+#      - appnet
+#    healthcheck:
+#      test: ["CMD-SHELL", "pg_isready -U hive -d metastore"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
 
-  hive-metastore:
-    platform: linux/amd64
-    image: bde2020/hive:2.3.2-postgresql-metastore
-    container_name: hive-metastore
-    depends_on:
-      - hive-metastore-postgresql
-      - hdfs-namenode
-    ports:
-      - "9083:9083"
-    environment:
-      HIVE_METASTORE_DB_TYPE: postgres
-      HIVE_METASTORE_DB_HOST: hive-metastore-postgresql
-      # 注意：不再需要 SERVICE_PRECONDITION，因为我们用了更可靠的 healthcheck
-    networks:
-      - appnet
-    # 提醒: 需要在本地 ./conf 目录下准备好 hive-site.xml 和 core-site.xml 文件
-    volumes:
-      - ./conf/hive-site.xml:/opt/hive/conf/hive-site.xml:ro
-      - ./conf/core-site.xml:/opt/hadoop-2.7.4/etc/hadoop/core-site.xml
+#  hive-metastore:
+#    platform: linux/amd64
+#    image: bde2020/hive:2.3.2-postgresql-metastore
+#    container_name: hive-metastore
+#    depends_on:
+#      - hive-metastore-postgresql
+#      - hdfs-namenode
+#    ports:
+#      - "9083:9083"
+#    environment:
+#      HIVE_METASTORE_DB_TYPE: postgres
+#      HIVE_METASTORE_DB_HOST: hive-metastore-postgresql
+#      # 注意：不再需要 SERVICE_PRECONDITION，因为我们用了更可靠的 healthcheck
+#    networks:
+#      - appnet
+#    # 提醒: 需要在本地 ./conf 目录下准备好 hive-site.xml 和 core-site.xml 文件
+#    volumes:
+#      - ./conf/hive-site.xml:/opt/hive/conf/hive-site.xml:ro
+#      - ./conf/core-site.xml:/opt/hadoop-2.7.4/etc/hadoop/core-site.xml
 
-  starrocks-fe:
-    image: starrocks/fe-ubuntu:latest # 使用latest或固定一个新版本
-    container_name: starrocks-fe-1
-    ports:
-      - "8030:8030"
-      - "9030:9030"
-    environment:
-      - FE_SERVERS=starrocks-fe-1:9030 # 建议加上端口
-    networks:
-      - appnet
-
-  starrocks-be:
-    image: starrocks/be-ubuntu:latest # 使用latest或固定一个新版本
-    container_name: starrocks-be-1
-    ports:
-      - "8040:8040"
-    depends_on:
-      - starrocks-fe
-    volumes:
-      - ./be-storage:/opt/starrocks/be/storage
-      # 提醒: 需要在本地 ./be-conf 目录下准备好 be.conf 文件
-      - ./be-conf/be.conf:/opt/starrocks/be/conf/be.conf
-    networks:
-      - appnet
+#  starrocks-fe:
+#    image: starrocks/fe-ubuntu:latest # 使用latest或固定一个新版本
+#    container_name: starrocks-fe-1
+#    ports:
+#      - "8030:8030"
+#      - "9030:9030"
+#    environment:
+#      - FE_SERVERS=starrocks-fe-1:9030 # 建议加上端口
+#    networks:
+#      - appnet
+#
+#  starrocks-be:
+#    image: starrocks/be-ubuntu:latest # 使用latest或固定一个新版本
+#    container_name: starrocks-be-1
+#    ports:
+#      - "8040:8040"
+#    depends_on:
+#      - starrocks-fe
+#    volumes:
+#      - ./be-storage:/opt/starrocks/be/storage
+#      # 提醒: 需要在本地 ./be-conf 目录下准备好 be.conf 文件
+#      - ./be-conf/be.conf:/opt/starrocks/be/conf/be.conf
+#    networks:
+#      - appnet
 
 # -----------------------------------------------------------------
 # Volumes and Networks Definition

@@ -151,12 +151,12 @@
         </div>
     </div>
 
-    <!--    <div id="live-stats-bar" class="absolute top-20 left-4 right-4 z-20 flex justify-around p-2 text-xs font-bold text-white bg-black/50 rounded-lg max-w-md mx-auto">-->
-    <!--        <div>👥 用户数: <span id="stat-user">0</span></div>-->
-    <!--        <div>👍 获赞数: <span id="stat-like">0</span></div>-->
-    <!--        <div>💬 评论数: <span id="stat-comment">0</span></div>-->
-    <!--        <div>🎁 礼物数: <span id="stat-gift">0</span></div>-->
-    <!--    </div>-->
+<!--    <div id="live-stats-bar" class="absolute top-20 left-4 right-4 z-20 flex justify-around p-2 text-xs font-bold text-white bg-black/50 rounded-lg max-w-md mx-auto">-->
+<!--        <div>👥 用户数: <span id="stat-user">0</span></div>-->
+<!--        <div>👍 获赞数: <span id="stat-like">0</span></div>-->
+<!--        <div>💬 评论数: <span id="stat-comment">0</span></div>-->
+<!--        <div>🎁 礼物数: <span id="stat-gift">0</span></div>-->
+<!--    </div>-->
 
     <div class="relative z-10 w-full h-full flex flex-col">
         <div class="top-gradient p-4 flex justify-between items-start">
@@ -214,11 +214,11 @@
                  style="width:0%">
 
             </div>
-            <!--            &lt;!&ndash; 小滑块可选 &ndash;&gt;-->
-            <!--            <div id="video-progress-thumb"-->
-            <!--                 class="absolute -top-1 w-3 h-3 bg-pink-500 rounded-full shadow group-hover:scale-125 transition"-->
-            <!--                 style="left:0%;">-->
-            <!--            </div>-->
+<!--            &lt;!&ndash; 小滑块可选 &ndash;&gt;-->
+<!--            <div id="video-progress-thumb"-->
+<!--                 class="absolute -top-1 w-3 h-3 bg-pink-500 rounded-full shadow group-hover:scale-125 transition"-->
+<!--                 style="left:0%;">-->
+<!--            </div>-->
 
         </div>
         <!-- 3. 时间信息放最右 -->
@@ -308,7 +308,7 @@
 
     let ws;
     const MY_USER_ID = "user_" + Math.random().toString(36).substr(2, 9);
-    const WS_URL = "ws://3.135.202.103:8080/ws";
+    const WS_URL = "ws://localhost:8080/ws";
 
     // --- Data Logic Variables ---
     const realtimeUserSet = new Set();
@@ -412,7 +412,7 @@
 
     // --- Stats WebSocket (for Dashboard) ---
     // ... (statsWs 逻辑保持不变) ...
-    const statsWs = new WebSocket("ws://3.135.202.103:8080/ws");
+    const statsWs = new WebSocket("ws://localhost:8080/stats-ws");
     statsWs.onopen = () => console.log('stats-ws 连接成功');
     statsWs.onmessage = function(event) {
         const stats = JSON.parse(event.data);
